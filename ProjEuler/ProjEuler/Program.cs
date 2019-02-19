@@ -14,7 +14,7 @@ namespace ProjEuler
         {
             Stopwatch stopWatch = new Stopwatch();
             stopWatch.Start();
-            Console.WriteLine(Problem4.LargestPalindromeProduct(1000));
+            Console.WriteLine(Problem6.SumSquareDifference(100));
             stopWatch.Stop();
             Console.WriteLine(stopWatch.Elapsed);
             Console.ReadLine();
@@ -60,7 +60,7 @@ namespace ProjEuler
             int a = 1;
             int b = 1;
             FibbonacciTerms.Add(b);
-            //Fibbonacci sequence, untill n, each number is equal to the last two combined.
+            //Fibbonacci sequence, until n, each number is equal to the last two combined.
             for (int c = 2; c < n; c = a + b)
             {
                 a = b;
@@ -86,7 +86,7 @@ namespace ProjEuler
         public static int LargestPalindromeProduct(int n)
         {
             int largest = 0;
-            //Loop through every combination of numbers untill n
+            //Loop through every combination of numbers until n
             for (int i = 0; i < n; i++)
             {
                 for (int j = 0; j < n; j++)
@@ -104,13 +104,82 @@ namespace ProjEuler
             return largest;
         }
     }
+    // Smallest Multiple
+    //Console.WriteLine(Problem5.SmallestMultiple(20));
+    class Problem5
+    {
+        public static int SmallestMultiple(int n)
+        {
+            PrimeFunctions.GeneratePrimesSieveOfEratosthenesTillNToList(n);
+            List<int> FactorList = new List<int>();
+            //Loop until highest multiple
+            for(int i=2;i<=n;i++)
+            {
+                //Find all the factors of the number
+                List<int> factors = PrimeFunctions.PrimeFactor(i,false);
+                //If the list of factors doesn't contain the factor or as many factors, then add it to the list
+                foreach(int factor in factors)
+                {
+                    if(MiscFunctions.ReturnDistinctCountList(factors,factor)> MiscFunctions.ReturnDistinctCountList(FactorList, factor))
+                    {
+                        FactorList.Add(factor);
+                    }
+                }
+                
+            }
+            //Loop through the minimum required factors and multiply them all
+            int mult = 1;
+            foreach (int factor in FactorList)
+            {
+                mult *= factor;
+            }
+            return mult;
+        }
+    }
+    //SumSquareDifference
+    //Console.WriteLine(Problem6.SumSquareDifference(100));
+    class Problem6
+    {
+        public static long SumSquareDifference(int n)
+        {
+            long sum = MiscFunctions.AddFrom1toN(n);
+            long squaresum = sum * sum;
+            long sumsquare = 0;
+            for(int i=1;i<=n;i++)
+            {
+                sumsquare += (i * i);
+            }
+            return squaresum - sumsquare;
+        }
+    }
     //All my Prime Functions
     class PrimeFunctions
     {
         public static List<int> PrimeList = new List<int>();
+        public static List<int> PrimeFactor(long n, bool t)
+        {
+            if(t)
+            { 
+                PrimeList = GeneratePrimesSieveOfEratosthenes((int)Math.Sqrt((double)n));
+            }
+            List<int> factors = new List<int>();
+            while (n > 1)
+            {
+                for (int i = 0; i < PrimeList.Count(); i++)
+                {
+                    if (n % PrimeList[i] == 0)
+                    {
+                        factors.Add(PrimeList[i]);
+                        n /= PrimeList[i];
+                        break;
+                    }
+                }
+            }
+            return factors;
+        }
         public static List<int> PrimeFactor(long n)
         {
-            PrimeList = GeneratePrimesSieveOfEratosthenes((int)Math.Sqrt((double)n));
+            
             List<int> factors = new List<int>();
             while (n > 1)
             {
@@ -167,7 +236,19 @@ namespace ProjEuler
             }
             return bits;
         }
-
+        public static void GeneratePrimesToList(int n)
+        {
+            int limit = ApproximateNthPrime(n);
+            BitArray bits = SieveOfEratosthenes(limit);
+            for (int i = 0, found = 0; i < limit && found < n; i++)
+            {
+                if (bits[i])
+                {
+                    PrimeList.Add(i);
+                    found++;
+                }
+            }
+        }
         public static List<int> GeneratePrimesSieveOfEratosthenes(int n)
         {
             int limit = ApproximateNthPrime(n);
@@ -183,6 +264,33 @@ namespace ProjEuler
             }
             return primes;
         }
+        public static List<int> GeneratePrimesSieveOfEratosthenesTillN(int n)
+        {
+            BitArray bits = SieveOfEratosthenes(n+1);
+            List<int> primes = new List<int>();
+            for (int i = 0, found = 0; i <= n && found < n; i++)
+            {
+                if (bits[i])
+                {
+                    primes.Add(i);
+                    found++;
+                }
+            }
+            return primes;
+        }
+        public static void GeneratePrimesSieveOfEratosthenesTillNToList(int n)
+        {
+            BitArray bits = SieveOfEratosthenes(n + 1);
+            List<int> primes = new List<int>();
+            for (int i = 0, found = 0; i <= n && found < n; i++)
+            {
+                if (bits[i])
+                {
+                    PrimeList.Add(i);
+                    found++;
+                }
+            }
+        }
     }
     //Combinatoric functions
     class CombinatoricFunctions
@@ -191,6 +299,18 @@ namespace ProjEuler
         {
             IEnumerable<char> forwards = l.ToString().ToCharArray();
             return forwards.SequenceEqual(forwards.Reverse());
+        }
+    }
+    //Uncatagorized useful functions
+    class MiscFunctions
+    {
+        public static int ReturnDistinctCountList(List<int> list,int a)
+        {
+            return list.Where(x => x.Equals(a)).Count();
+        }
+        public static long AddFrom1toN(long n)
+        {
+            return (n * n + 1 / 2);
         }
     }
 }
