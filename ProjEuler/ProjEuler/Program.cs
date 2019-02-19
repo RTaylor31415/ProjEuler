@@ -118,6 +118,7 @@ namespace ProjEuler
             int sum = 0;
             for (int i = 1; i < c; i++)
             {
+                //If a number is divisible by a or b add it to the sum
                 if (i % a == 0 || i % b == 0)
                 {
                     sum += i;
@@ -135,6 +136,7 @@ namespace ProjEuler
         {
             int sum = 0;
             GenerateFibbonacciNumbers(n);
+            //Every third number is even starting on the second number, loop through these and add them to sum
             for (int i = 1; i < FibbonacciTerms.Count; i += 3)
             {
                 sum += FibbonacciTerms[i];
@@ -146,9 +148,9 @@ namespace ProjEuler
             int a = 1;
             int b = 1;
             FibbonacciTerms.Add(b);
+            //Fibbonacci sequence, untill n, each number is equal to the last two combined.
             for (int c = 2; c < n; c = a + b)
             {
-                c = a + b;
                 a = b;
                 b = c;
                 FibbonacciTerms.Add(c);
@@ -161,19 +163,23 @@ namespace ProjEuler
     {
         public static int LargestPrimeFactor(long n)
         {
+            //Return the largest number in the list of prime factors
             return PrimeFunctions.PrimeFactor(n).Max();
         }
     }
     //Largest Palindrome Product
+    //Console.WriteLine(Problem4.LargestPalindromeProduct(1000));
     class Problem4
     {
         public static int LargestPalindromeProduct(int n)
         {
             int largest = 0;
+            //Loop through every combination of numbers untill n
             for (int i = 0; i < n; i++)
             {
                 for (int j = 0; j < n; j++)
                 {
+                    //If i*j is a palindrome then check if it's largest then the largest so far and set it to an int
                     if (CombinatoricFunctions.IsPalindrome(i * j))
                     {
                         if ((i * j) > largest)
