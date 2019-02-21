@@ -5,6 +5,7 @@ using System.Text;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Collections;
+using System.Numerics;
 
 namespace ProjEuler
 {
@@ -14,7 +15,8 @@ namespace ProjEuler
         {
             Stopwatch stopWatch = new Stopwatch();
             stopWatch.Start();
-            Console.WriteLine(Problem6.SumSquareDifference(100));
+            Console.WriteLine(Problem13.LargeSum("Problem13"));
+
             stopWatch.Stop();
             Console.WriteLine(stopWatch.Elapsed);
             Console.ReadLine();
@@ -110,22 +112,22 @@ namespace ProjEuler
     {
         public static int SmallestMultiple(int n)
         {
-            PrimeFunctions.GeneratePrimesSieveOfEratosthenesTillNToList(n);
+            PrimeFunctions.GeneratePrimesTillNToList(n);
             List<int> FactorList = new List<int>();
             //Loop until highest multiple
-            for(int i=2;i<=n;i++)
+            for (int i = 2; i <= n; i++)
             {
                 //Find all the factors of the number
-                List<int> factors = PrimeFunctions.PrimeFactor(i,false);
+                List<int> factors = PrimeFunctions.PrimeFactor(i, false);
                 //If the list of factors doesn't contain the factor or as many factors, then add it to the list
-                foreach(int factor in factors)
+                foreach (int factor in factors)
                 {
-                    if(MiscFunctions.ReturnDistinctCountList(factors,factor)> MiscFunctions.ReturnDistinctCountList(FactorList, factor))
+                    if (MiscFunctions.ReturnDistinctCountList(factors, factor) > MiscFunctions.ReturnDistinctCountList(FactorList, factor))
                     {
                         FactorList.Add(factor);
                     }
                 }
-                
+
             }
             //Loop through the minimum required factors and multiply them all
             int mult = 1;
@@ -144,23 +146,200 @@ namespace ProjEuler
         {
             long sum = MiscFunctions.AddFrom1toN(n);
             long squaresum = sum * sum;
+
             long sumsquare = 0;
-            for(int i=1;i<=n;i++)
+            for (int i = 1; i <= n; i++)
             {
                 sumsquare += (i * i);
             }
             return squaresum - sumsquare;
         }
     }
+    //10001st Prime
+    //Console.WriteLine(Problem7.TenthousandstPrime(10001));
+    class Problem7
+    {
+        public static int TenthousandstPrime(int n)
+        {
+            return PrimeFunctions.NthPrime(n);
+        }
+    }
+    //LargestProductInASeries
+    //Console.WriteLine(Problem8.LargestProductInASeries("Problem8",13));
+    class Problem8
+    {
+        public static long LargestProductInASeries(string n, int m)
+        {
+            long maxmult = 1;
+            long mult = 1;
+            string file = FileFunctions.readfileintostring("Problem8");
+            int[] filenums = FileFunctions.stringtointarray(file);
+            for (int i = 0; i < filenums.Length - m; i++)
+            {
+                mult = 1;
+                for (int j = i; j < i + m; j++)
+                {
+                    mult *= filenums[j];
+                }
+                if (mult > maxmult)
+                {
+                    maxmult = mult;
+                }
+            }
+
+            return maxmult;
+        }
+    }
+    //SpecialPythagoreanTriplet
+    //Console.WriteLine(Problem9.SpecialPythagoreanTriplet(1000));
+    class Problem9
+    {
+        public static int SpecialPythagoreanTriplet(int n)
+        {
+            for (int i = 1; i < n; i++)
+            {
+                for (int j = 1; j < n; j++)
+                {
+                    double k = Math.Sqrt((i * i) + (j * j));
+                    if (Math.Abs(k - (int)k) < double.Epsilon)
+                    {
+                        if (i + j + (int)k == 1000)
+                        {
+                            return (i * j * (int)k);
+                        }
+                    }
+                }
+            }
+            return 0;
+        }
+        public bool IsTriplet(int a, int b, int c)
+        {
+            return ((a * a) + (b * b) == (c * c));
+        }
+    }
+    //Summation of Primes
+    //Console.WriteLine(Problem10.SummationOfPrimes(2000000));
+    class Problem10
+    {
+        public static long SummationOfPrimes(int n)
+        {
+            List<int> primes = PrimeFunctions.GeneratePrimesTillN(2 * n);
+            long k = 0;
+            for (int i = 0; primes[i] < n; i++)
+            {
+                k += primes[i];
+            }
+            return k;
+        }
+    }
+    //LargestProductInAGrid
+    //Console.WriteLine(Problem11.LargestProductInAGrid("Problem11",4));
+    class Problem11
+    {
+        public static int LargestProductInAGrid(string n, int m)
+        {
+            int mult = 1;
+            string[] strnums = FileFunctions.readfileintostringarr(n);
+            int[][] nums = FileFunctions.stringtointarraySplit2d(strnums, ' ');
+            for(int i=0;i<nums.Count();i++)
+            {
+                for(int j=0;j<nums[0].Count();j++)
+                {
+                    if(i<nums.Count()-m)
+                    {
+                        int tempmult = 1;
+                        for(int k=0;k<m;k++)
+                        {
+                            tempmult *= nums[i + k][j];
+                        }
+                        if(tempmult>mult)
+                        {
+                            mult = tempmult;
+                        }
+                    }
+                    if(j<nums.Count()-m)
+                    {
+                        int tempmult = 1;
+                        for (int k = 0; k < m; k++)
+                        {
+                            tempmult *= nums[i][j+k];
+                        }
+                        if (tempmult > mult)
+                        {
+                            mult = tempmult;
+                        }
+                    }
+                    if (j < nums.Count() - m&&i<nums.Count()-m)
+                    {
+                        int tempmult = 1;
+                        for (int k = 0; k < m; k++)
+                        {
+                            tempmult *= nums[i+k][j + k];
+                        }
+                        if (tempmult > mult)
+                        {
+                            mult = tempmult;
+                        }
+                    }
+                    if (j >  m && i < nums.Count() - m)
+                    {
+                        int tempmult = 1;
+                        for (int k = 0; k < m; k++)
+                        {
+                            tempmult *= nums[i + k][j - k];
+                        }
+                        if (tempmult > mult)
+                        {
+                            mult = tempmult;
+                        }
+                    }
+
+                }
+            }
+            return mult;
+        }
+    }
+    //Highly Divisible Triangular Number
+    //Console.WriteLine(Problem12.HighlyDivisibleTriangularNumber(500));
+    class Problem12
+    {
+        public static int HighlyDivisibleTriangularNumber(int n)
+        {
+            List<int> triangles = SpecialSequences.triangularnumbers(n * n);
+            foreach(int triangle in triangles)
+            {
+                if(MiscFunctions.Divisors(triangle).Count()>n)
+                {
+                    return triangle;
+                }
+            }
+            return 0;
+        }
+    }
+    // Large Sum
+    class Problem13
+    {
+        public static string LargeSum(string n)
+        {
+            string[] nums = FileFunctions.readfileintostringarr(n);
+            List<BigInteger> bigs = FileFunctions.stringarrtobigint(nums);
+            return bigs.Aggregate(BigInteger.Add).ToString();
+        }
+    }
     //All my Prime Functions
     class PrimeFunctions
     {
         public static List<int> PrimeList = new List<int>();
+        public static int NthPrime(int n)
+        {
+            GeneratePrimesToList(n+1);
+            return PrimeList[n - 1];
+        }
         public static List<int> PrimeFactor(long n, bool t)
         {
             if(t)
             { 
-                PrimeList = GeneratePrimesSieveOfEratosthenes((int)Math.Sqrt((double)n));
+                PrimeList = GeneratePrimes((int)Math.Sqrt((double)n));
             }
             List<int> factors = new List<int>();
             while (n > 1)
@@ -249,7 +428,7 @@ namespace ProjEuler
                 }
             }
         }
-        public static List<int> GeneratePrimesSieveOfEratosthenes(int n)
+        public static List<int> GeneratePrimes(int n)
         {
             int limit = ApproximateNthPrime(n);
             BitArray bits = SieveOfEratosthenes(limit);
@@ -264,11 +443,11 @@ namespace ProjEuler
             }
             return primes;
         }
-        public static List<int> GeneratePrimesSieveOfEratosthenesTillN(int n)
+        public static List<int> GeneratePrimesTillN(int n)
         {
             BitArray bits = SieveOfEratosthenes(n+1);
             List<int> primes = new List<int>();
-            for (int i = 0, found = 0; i <= n && found < n; i++)
+            for (int i = 0, found = 0;i < n; i++)
             {
                 if (bits[i])
                 {
@@ -278,11 +457,11 @@ namespace ProjEuler
             }
             return primes;
         }
-        public static void GeneratePrimesSieveOfEratosthenesTillNToList(int n)
+        public static void GeneratePrimesTillNToList(int n)
         {
             BitArray bits = SieveOfEratosthenes(n + 1);
             List<int> primes = new List<int>();
-            for (int i = 0, found = 0; i <= n && found < n; i++)
+            for (int i = 0, found = 0;i< n; i++)
             {
                 if (bits[i])
                 {
@@ -292,6 +471,7 @@ namespace ProjEuler
             }
         }
     }
+
     //Combinatoric functions
     class CombinatoricFunctions
     {
@@ -302,16 +482,103 @@ namespace ProjEuler
         }
     }
     //Uncatagorized useful functions
+    class SpecialSequences
+    {
+        public static List<int> triangularnumbers(int n)
+        {
+            List<int> triangles = new List<int>();
+
+            triangles.Add(1);
+            for (int i=2;i<n;i++)
+            {
+                triangles.Add(i+triangles[i-2]);
+                
+            }
+            return triangles;
+        }
+    }
     class MiscFunctions
     {
-        public static int ReturnDistinctCountList(List<int> list,int a)
+        public static int ReturnDistinctCountList(List<int> list, int a)
         {
             return list.Where(x => x.Equals(a)).Count();
         }
         public static long AddFrom1toN(long n)
         {
-            return (n * n + 1 / 2);
+            return ((n * (n + 1)) / 2);
+        }
+        public static List<int> Divisors(int n)
+        {
+            List<int> divisors = new List<int>();
+            // Note that this loop runs  
+            // till square root 
+            for (int i = 1; i <= Math.Sqrt(n);i++)
+            {
+                if (n % i == 0)
+                {
+
+                    // If divisors are equal, 
+                    if (n / i == i)
+                    { 
+                        divisors.Add(i);
+                    }
+                    else
+                    {
+                        divisors.Add(i);
+                        divisors.Add(n / i);
+                    }
+                }
+            }
+            return divisors;
         }
     }
+    class FileFunctions
+    { 
+        public static string readfileintostring(string n)
+        {
+            string text = System.IO.File.ReadAllText(@"C:\Users\Ryan\source\repos\ProjEuler\ProjEuler\ProjEuler\bin\" + n+ ".txt");
+            return text;
+        }
+        public static string[] readfileintostringarr(string n)
+        {
+            string[] text = System.IO.File.ReadAllLines(@"C:\Users\Ryan\source\repos\ProjEuler\ProjEuler\ProjEuler\bin\" + n + ".txt");
+            return text;
+        }
+        public static int[] stringtointarray(string n)
+        {
+            char[] temp = n.ToCharArray();
+            int[] numbers = Array.ConvertAll(temp, c => (int)Char.GetNumericValue(c));
+            int numToRemove = -1;
+            numbers = numbers.Where(val => val != numToRemove).ToArray();
+            return numbers;
+        }
+        public static int[] stringtointarraySplit(string n, char p)
+        {
+            string[] strings = n.Split(' ');
+            return Array.ConvertAll(strings, int.Parse);
+        }
+        public static List<BigInteger> stringarrtobigint(string[] arr)
+        {
+            List<BigInteger> big = new List<BigInteger>();
+            foreach(string bleh in arr)
+            {
+                big.Add(BigInteger.Parse(bleh));
+            }
+            return big;
+        }
+        public static int[][] stringtointarraySplit2d(string[] n, char p)
+        {
+            string[] t = n[0].Split(' ');
+            int [][] arr = new int[n.Count()][];
+            for(int i=0;i<n.Count();i++)
+            {
+                string[] temp = n[i].Split(' ');
+                arr[i] = Array.ConvertAll(temp, int.Parse);
+            }
+            return arr;
+
+        }
+    }
+
 }
 
