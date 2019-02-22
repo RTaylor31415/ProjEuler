@@ -15,8 +15,8 @@ namespace ProjEuler
         {
             Stopwatch stopWatch = new Stopwatch();
             stopWatch.Start();
-            Console.WriteLine(Problem13.LargeSum("Problem13"));
 
+            Console.WriteLine(Problem16.PowerDigitSum(2,1000));
             stopWatch.Stop();
             Console.WriteLine(stopWatch.Elapsed);
             Console.ReadLine();
@@ -317,6 +317,7 @@ namespace ProjEuler
         }
     }
     // Large Sum
+    // Console.WriteLine(Problem13.LargeSum("Problem13"));
     class Problem13
     {
         public static string LargeSum(string n)
@@ -326,6 +327,60 @@ namespace ProjEuler
             return bigs.Aggregate(BigInteger.Add).ToString();
         }
     }
+    //Collatz sequence
+    //Console.WriteLine(Problem14.LongestCollatzSequence(1000000));
+    class Problem14
+    {
+        public static long LongestCollatzSequence(int n)
+        {
+            SpecialSequences.generatecollatz(n);
+            int max = SpecialSequences.CollatzSequences.Values.Max();
+            return SpecialSequences.CollatzSequences.FirstOrDefault(x => x.Value == max).Key;
+        }
+    }
+    // Lattice Paths
+    // Console.WriteLine(Problem15.LatticePathsFast(20));
+    class Problem15
+    {
+        public static int LatticePaths(int n)
+        {
+            return availablepaths(0, 0, n);
+        }
+        
+        public static int availablepaths(int a, int b,int c)
+        {
+            int sum=0;
+            if(a<c)
+            {
+                sum += availablepaths(a + 1, b, c);
+            }
+            if(b<c)
+            {
+                sum += availablepaths(a, b + 1, c);
+            }
+            if(a==c&&b==c)
+            {
+                return 1;
+            }
+            return sum;
+        }
+        public static string LatticePathsFast(int n)
+        {
+            return CombinatoricFunctions.binomialcoeff(2 * n, n).ToString();
+        }
+    }
+    // Power Digit Sum
+    class Problem16
+    {
+        public static int PowerDigitSum(int n, int k)
+        {
+            BigInteger pow = BigInteger.Pow(n, k);
+            return pow.ToString().Sum(c => int.Parse(new String(new char[] { c })));
+
+        }
+    }
+    
+    
     //All my Prime Functions
     class PrimeFunctions
     {
@@ -480,10 +535,27 @@ namespace ProjEuler
             IEnumerable<char> forwards = l.ToString().ToCharArray();
             return forwards.SequenceEqual(forwards.Reverse());
         }
+        public static BigInteger factorial(int n)
+        {
+            BigInteger result=1;
+            for (int i = 1; i <= n; i++)
+            {
+                result = result * i;
+            }
+            return result;
+        }
+        public static BigInteger binomialcoeff(int n, int k)
+        {
+            BigInteger top = factorial(n);
+            BigInteger bottom = factorial(n - k) * factorial(k);
+            return top / bottom;
+        }
     }
     //Uncatagorized useful functions
     class SpecialSequences
     {
+
+        public static Dictionary<long, int> CollatzSequences = new Dictionary<long, int>();
         public static List<int> triangularnumbers(int n)
         {
             List<int> triangles = new List<int>();
@@ -495,6 +567,37 @@ namespace ProjEuler
                 
             }
             return triangles;
+        }
+        public static void generatecollatz(int n)
+        {
+            for(int i=2;i<n;i++)
+            {
+                long temp = i;
+                int count = 1;
+                while(temp>1)
+                {
+                    if (CollatzSequences.ContainsKey(temp))
+                    {
+                        count += CollatzSequences[temp]-1;
+                        temp = 1;
+                    }
+                    else
+                    {
+                        if(temp%2==0)
+                        {
+                            temp /= 2;
+                        }
+                        else
+                        {
+                            temp *= 3;
+                            temp++;
+                        }
+                        count++;
+                    }
+                }
+
+                CollatzSequences.Add(i, count);
+            }
         }
     }
     class MiscFunctions
