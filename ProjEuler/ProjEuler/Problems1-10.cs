@@ -6,9 +6,6 @@ using System.Threading.Tasks;
 
 namespace ProjEuler
 {
-    class Problems1_10
-    {
-
         //Multiples of 3 and 5
         //Console.WriteLine(Problem1.SumOfMult(3,5,1000));
         public class Problem1
@@ -218,5 +215,4 @@ namespace ProjEuler
                 return k;
             }
         }
-    }
 }
