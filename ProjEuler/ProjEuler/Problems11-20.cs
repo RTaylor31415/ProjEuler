@@ -80,7 +80,7 @@ namespace ProjEuler
     {
         public static int HighlyDivisibleTriangularNumber(int n)
         {
-            List<int> triangles = SpecialSequences.triangularnumbers(n * n);
+            List<long> triangles = SpecialSequences.triangularnumbers(n * n);
             foreach (int triangle in triangles)
             {
                 if (MiscFunctions.Divisors(triangle).Count() > n)

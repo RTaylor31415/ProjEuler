@@ -15,7 +15,7 @@ namespace ProjEuler
         {
             Stopwatch stopWatch = new Stopwatch();
             stopWatch.Start();
-            Console.WriteLine(Problem25.fibbonacciNumber(1000)); 
+            Console.WriteLine(Problem47.DistinctPrimeFactors());
             Console.WriteLine();
             stopWatch.Stop();
             Console.WriteLine(stopWatch.Elapsed);
@@ -24,148 +24,222 @@ namespace ProjEuler
 
     }
 
-
     
-    // Amicable Numbers
-    //Console.WriteLine(Problem21.AmicableNumbers(10000)); 
-    class Problem21
+    class Problem41
     {
-        public static int AmicableNumbers(int n)
+        public static int PandigitalPrime(int n)
         {
-            int sum = 0;
-            for(int i=1;i<n;i++)
+            List<int> PanPrimes = new List<int>();
+            PrimeFunctions.GeneratePrimesTillNToList(n);
+            for(int i=0;i<PrimeFunctions.PrimeList.Count;i++)
             {
-                if(Amicability(i))
+                if(MiscFunctions.IsPandigital(PrimeFunctions.PrimeList[i]))
                 {
-                    sum += i;
+                    PanPrimes.Add(PrimeFunctions.PrimeList[i]);
+                }
+            }
+            return PanPrimes.Max();
+        }
+    }
+
+    class Problem42
+    {
+        public static int CodedTriangleNumbers(string n)
+        {
+            int count = 0;
+            string str = FileFunctions.readfileintostring("Problem42");
+            str = str.Replace("/", "");
+            str = str.Replace("\"", "");
+            string[] arr = str.Split(',');
+            List<long> triangles = SpecialSequences.triangularnumbers(1000);
+            foreach(string word in arr)
+            {
+                if(triangles.Contains(MiscFunctions.UppercaseWordValue(word)))
+                {
+                    count++;
+                }
+            }
+            return count;
+        }
+    }
+
+    class Problem43
+    {
+        public static List<int> nums = new List<int>() { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+        public static List<int> primes = PrimeFunctions.GeneratePrimesTillN(50);
+        public static long SubstringDivisibility()
+        {
+            long sum = 0;
+            
+            var perm = SomeExtensions.GetPermutations(nums);
+            List<List<int>> list = FileFunctions.ienumtolist(perm);
+            foreach(List<int> num in list)
+            {
+                if(SubStringTest(num))
+                {
+                    sum += MiscFunctions.ListToLong(num);
                 }
             }
             return sum;
         }
-        public static bool Amicability(int n)
+        public static bool SubStringTest(List<int> num)
         {
-            int a = MiscFunctions.ProperDivisors(n).Sum() ;
-            if (a != n)
-            {
-                return MiscFunctions.ProperDivisors(a).Sum() == n;
-            }
-            else
+            if (num[0] == 0)
             {
                 return false;
             }
-        }
-    }
-    //Names Scores
-    //Console.WriteLine(Problem22.NamesScores("Problem22")); 
-    class Problem22
-    {
-        public static long NamesScores(string n)
-        {
-            long sum = 0;
-            string names = FileFunctions.readfileintostring(n);
-            string[] namessplit = names.Split(',');
-            Array.Sort(namessplit, StringComparer.InvariantCulture);
-            for (int i=0;i<namessplit.Length;i++)
+            for (int i = 3; i < num.Count; i++)
             {
-                int tempsum = 0;
-                for(int j=1;j<namessplit[i].Length-1;j++)
+                int temp = (num[i - 2] * 100) + (num[i - 1] * 10) + num[i];
+                if (temp % primes[i - 3] != 0)
                 {
-                    string m = namessplit[i];
-                    char k = m[j];
-                    tempsum += namessplit[i][j]-64;
+                    return false;
                 }
-                sum += (tempsum*(i+1));
             }
-            return sum;
+            return true;
         }
     }
-    //Non-Abundant Sums
-    //Console.WriteLine(Problem23.NonAbundantSums(28124)) ; 
-    class Problem23
+
+    //Console.WriteLine(Problem44.PentagonNumbers(10000));
+    class Problem44
     {
-        public static HashSet<int> abundantnums = new HashSet<int>();
-        public static int NonAbundantSums(int n)
+        public static int PentagonNumbers(int n)
         {
-            GenerateAbundantNums(n);
-            int sum = 0;
-            for(int i=1;i<n;i++)
+            int min = int.MaxValue;
+            List<long> pentagons = SpecialSequences.pentagonalnumbers(n);
+            HashSet<long> hashpent =new HashSet<long>(pentagons);
+            foreach(int k in pentagons)
             {
-                bool notfound = true;
-                foreach(int k in abundantnums)
+                foreach(int j in pentagons)
                 {
-                    if(abundantnums.Contains(i - k))
+                    int tempsum = k + j;
+                    if(!hashpent.Contains(tempsum))
                     {
-                        notfound = false;
-                        break;
+                        continue;
+                    }
+                    int tempmin = k - j;
+                    if(!hashpent.Contains(tempmin))
+                    {
+                        continue;
+                    }
+                    if(tempmin<min)
+                    {
+                        min = tempmin;
                     }
                 }
-                if(notfound)
+            }
+            return min;
+        }
+    }
+
+    class Problem45
+    {
+        public static long TriangularPentagonalHexagonal(int n)
+        {
+            List<long> pentagon = SpecialSequences.pentagonalnumbers(n);
+            List<long> hexagon = SpecialSequences.hexagonalnumbers(n);
+            HashSet<long> penthash = new HashSet<long>(pentagon);
+            for(int i=143;i<hexagon.Count;i++)
+            {
+                if (penthash.Contains(hexagon[i]))
                 {
-                    sum += i;
+                    return hexagon[i] ;
                 }
             }
-            return sum;
+            return 0;
         }
-        public static void GenerateAbundantNums(int n)
+    }
+
+    class Problem46
+    {
+        public static int OddComposite()
         {
-            for(int i=1;i<n;i++)
+            int comp = 0;
+            List<int> primes = PrimeFunctions.GeneratePrimes(10000);
+            HashSet<int> primeshash = MiscFunctions.ListToHash(primes);
+            List<int> squares = SpecialSequences.squares(1000);
+
+            HashSet<int> squareshash = MiscFunctions.ListToHash(squares);
+            int i = 3;
+            bool found = false;
+            while(comp==0)
             {
-                if(Abundant(i))
+                found = false;
+                i += 2;
+                if (primeshash.Contains(i))
                 {
-                    abundantnums.Add(i);
+                    continue;
+                }
+                for(int j=0;j<primes.Count;j++)
+                {
+                    if(primes[j]>i)
+                    {
+                        break;
+                    }
+                    for(int k=0;k<squares.Count;k++)
+                    {
+                        if(squares[k]*2>i)
+                        {
+                            break;
+                        }
+                        if(primes[j]+(squares[k]*2)==i)
+                        {
+                            found = true;
+                        }
+                    }
+                }
+                if (!found)
+                {
+                    comp = i;
                 }
             }
-        }
-        public static bool Abundant(int n)
-        {
-            return (MiscFunctions.ProperDivisors(n).Sum() > n);
+            return comp;
         }
     }
-    //Lexicographic Permutations
-    class Problem24
+
+    class Problem47
     {
-        public static string LexicographicPermutations(int n,int k)
+        public static int DistinctPrimeFactors()
         {
-            List<int> nums= new List<int>();
-            for(int i=0;i<=n;i++)
+            PrimeFunctions.GeneratePrimesToList(100000);
+            int i = 2;
+            int count = 0;
+            while (count < 4)
             {
-                nums.Add(i);
+                i++;
+                List<int> primes = PrimeFunctions.PrimeFactor(i);
+                HashSet<int> factors = MiscFunctions.ListToHash(primes);
+                if(factors.Count==4)
+                {
+                    count++;
+                }
+                else
+                {
+                    count = 0;
+                }
             }
-            //IEnumerable<IEnumerable<int>> numper = CombinatoricFunctions.GetPermutations(nums, n+1);
-            IEnumerable<IEnumerable<int>> numper = SomeExtensions.GetPermutations(nums);
-            List<List<int>> list = numper.Select(c => c.ToList()).ToList();
-
-
-            return MiscFunctions.ListToString(list[k-1]);
-
+            return i - 3;
         }
     }
-    class Problem25
-    {
-        public static int fibbonacciNumber(int n)
-        {
-            SpecialSequences.GenerateFibbonacciDigits(n);
-            return SpecialSequences.fibbonaccisequence.Count+1;
-        }
-    }
-    class Problem26
-    {
 
-    }
-    
     //All my Prime Functions
     class PrimeFunctions
     {
         public static List<int> PrimeList = new List<int>();
+        public static HashSet<int> PrimeListHash = new HashSet<int>();
         public static int NthPrime(int n)
         {
-            GeneratePrimesToList(n+1);
+            GeneratePrimesToList(n + 1);
             return PrimeList[n - 1];
+        }
+        public static void ConvertToHash()
+        {
+            PrimeListHash = new HashSet<int>(PrimeList);
         }
         public static List<int> PrimeFactor(long n, bool t)
         {
-            if(t)
-            { 
+            if (t)
+            {
                 PrimeList = GeneratePrimes((int)Math.Sqrt((double)n));
             }
             List<int> factors = new List<int>();
@@ -185,7 +259,7 @@ namespace ProjEuler
         }
         public static List<int> PrimeFactor(long n)
         {
-            
+
             List<int> factors = new List<int>();
             while (n > 1)
             {
@@ -272,9 +346,9 @@ namespace ProjEuler
         }
         public static List<int> GeneratePrimesTillN(int n)
         {
-            BitArray bits = SieveOfEratosthenes(n+1);
+            BitArray bits = SieveOfEratosthenes(n + 1);
             List<int> primes = new List<int>();
-            for (int i = 0, found = 0;i < n; i++)
+            for (int i = 0, found = 0; i < n; i++)
             {
                 if (bits[i])
                 {
@@ -287,8 +361,7 @@ namespace ProjEuler
         public static void GeneratePrimesTillNToList(int n)
         {
             BitArray bits = SieveOfEratosthenes(n + 1);
-            List<int> primes = new List<int>();
-            for (int i = 0, found = 0;i< n; i++)
+            for (int i = 0, found = 0; i < n; i++)
             {
                 if (bits[i])
                 {
@@ -364,7 +437,25 @@ namespace ProjEuler
     }
     //Combinatoric functions
     class CombinatoricFunctions
-    {
+    { 
+        public static long concatenatenum(long a,long b)
+        {
+            string astr = a.ToString();
+            string bstr = b.ToString();
+            return Int64.Parse( String.Concat(astr,bstr));
+        }
+        public static List<int> truncations (int n)
+        {
+            List<int> trunc = new List<int>();
+            string t = n.ToString();
+            for(int i=0;i<t.Length;i++)
+            {
+                trunc.Add(Int32.Parse((t.Substring(t.Length - i - 1, i + 1))));
+                trunc.Add(Int32.Parse((t.Substring(0, i + 1))));
+            }
+            return trunc;
+        }
+        public static List<BigInteger> facts = new List<BigInteger>();
         public static IEnumerable<IEnumerable<T>> GetPermutations<T>(IEnumerable<T> list, int length)
         {
             if (length == 1) return list.Select(t => new T[] { t });
@@ -372,13 +463,45 @@ namespace ProjEuler
                 .SelectMany(t => list.Where(e => !t.Contains(e)),
                     (t1, t2) => t1.Concat(new T[] { t2 }));
         }
+        public static List<int> rotations(int n)
+        {
+            List<int> rots = new List<int>();
+            List<int> startingint = MiscFunctions.DigitsFromInt(n).ToList();
+            rots.Add(n);
+            for(int i=1;i<startingint.Count;i++)
+            {
+                startingint.Add(startingint[0]);
+                startingint.RemoveAt(0);
+                rots.Add(MiscFunctions.ListToInt(startingint));
+            }
+            return rots;
+        }
         public static bool IsPalindrome(long l)
         {
             IEnumerable<char> forwards = l.ToString().ToCharArray();
             return forwards.SequenceEqual(forwards.Reverse());
         }
+        public static bool IsPalindrome(string l)
+        {
+            return l.SequenceEqual(l.Reverse());
+        }
+
+        public static void generatefactorial(int n)
+        {
+            facts.Add(1);
+            BigInteger result = 1;
+            for (int i = 1; i <= n; i++)
+            {
+                result = result * i;
+                facts.Add(result);
+            }
+        }
         public static BigInteger factorial(int n)
         {
+            if(n<facts.Count)
+            {
+                return facts[n];
+            }
             BigInteger result = 1;
             for (int i = 1; i <= n; i++)
             {
@@ -392,33 +515,159 @@ namespace ProjEuler
             BigInteger bottom = factorial(n - k) * factorial(k);
             return top / bottom;
         }
+        // Enumerate all possible m-size combinations of [0, 1, ..., n-1] array
+        // in lexicographic order (first [0, 1, 2, ..., m-1]).
+        private static IEnumerable<int[]> CombinationsRosettaWoRecursion(int m, int n)
+        {
+            int[] result = new int[m];
+            Stack<int> stack = new Stack<int>(m);
+            stack.Push(0);
+            while (stack.Count > 0)
+            {
+                int index = stack.Count - 1;
+                int value = stack.Pop();
+                while (value < n)
+                {
+                    result[index++] = value++;
+                    stack.Push(value);
+                    if (index != m) continue;
+                    yield return (int[])result.Clone(); // thanks to @xanatos
+                                                        //yield return result;
+                    break;
+                }
+            }
+        }
+
+        public static IEnumerable<IEnumerable<T>> Subsets<T>(IEnumerable<T> source)
+        {
+            List<T> list = source.ToList();
+            int length = list.Count;
+            int max = (int)Math.Pow(2, list.Count);
+
+            for (int count = 0; count < max; count++)
+            {
+                List<T> subset = new List<T>();
+                uint rs = 0;
+                while (rs < length)
+                {
+                    if ((count & (1u << (int)rs)) > 0)
+                    {
+                        subset.Add(list[(int)rs]);
+                    }
+                    rs++;
+                }
+                yield return subset;
+            }
+        }
+        public static IEnumerable<T[]> CombinationsRosettaWoRecursion<T>(T[] array, int m)
+        {
+            if (array.Length < m)
+                throw new ArgumentException("Array length can't be less than number of selected elements");
+            if (m < 1)
+                throw new ArgumentException("Number of selected elements can't be less than 1");
+            T[] result = new T[m];
+            foreach (int[] j in CombinationsRosettaWoRecursion(m, array.Length))
+            {
+                for (int i = 0; i < m; i++)
+                {
+                    result[i] = array[j[i]];
+                }
+                yield return result;
+            }
+        }
     }
-        
+
     //Uncatagorized useful functions
     class SpecialSequences
     {
-
         public static Dictionary<long, int> CollatzSequences = new Dictionary<long, int>();
         public static List<BigInteger> fibbonaccisequence = new List<BigInteger>();
-        public static List<int> triangularnumbers(int n)
-        {
-            List<int> triangles = new List<int>();
 
-            triangles.Add(1);
-            for (int i=2;i<n;i++)
+
+        public static List<List<int>> GenerateTriangles(int n)
+        {
+            List<int> squares = new List<int>();
+            List<List<int>> triangles = new List<List<int>>();
+            for(int i=1;i<=n;i++)
             {
-                triangles.Add(i+triangles[i-2]);
-                
+                squares.Add(i * i);
+            }
+            for(int i=0;i<n;i++)
+            {
+
+                for(int j=0;j<n;j++)
+                {
+                    if (squares.Contains(squares[i] - squares[j]))
+                    {
+                        List<int> triple = new List<int>();
+                        triple.Add((int)Math.Sqrt(squares[i]));
+                        triple.Add((int)Math.Sqrt(squares[j]));
+                        triple.Add((int)Math.Sqrt(squares[i] - squares[j]));
+
+                        triple.Sort();
+                        triangles.Add(triple);
+                    }
+                }
+            }
+
+            var finalList = MiscFunctions.removedupes(triangles);
+            return finalList;
+        }
+        public static List<int> SpiralNumbers(int n)
+        {
+
+            List<int> spirals = new List<int>();
+            spirals.Add(1);
+            for (int i = 2; i < n + 1; i++)
+            {
+                spirals.Add(4 * ((4 * i * i) - (7 * i) + 4));
+            }
+            return spirals;
+        }
+
+        public static List<long> triangularnumbers(long n)
+        {
+            List<long> triangles = new List<long>();
+            for (long i = 1; i < n; i++)
+            {
+                triangles.Add((i *(i+1))/2);
             }
             return triangles;
         }
+        public static List<long> pentagonalnumbers(long n)
+        {
+            List<long> numbers = new List<long>();
+            for (long i = 1; i < n; i++)
+            {
+                numbers.Add((i*(3*i-1))/2);
+            }
+            return numbers;
+        }
+        public static List<long> hexagonalnumbers(long n)
+        {
+            List<long> numbers = new List<long>();
+            for (long i = 1; i < n; i++)
+            {
+                numbers.Add((i * ((2 * i) - 1)));
+            }
+            return numbers;
+        }
+        public static List<int> squares(int n)
+        {
+            List<int> numbers = new List<int>();
+            for (int i = 1; i < n; i++)
+            {
+                numbers.Add(i*i);
+            }
+            return numbers;
+        }
         public static void GenerateFibbonacciDigits(int n)
         {
-            BigInteger goal = BigInteger.Pow(10,n-1);
-            BigInteger nextnumber=1;
-            BigInteger thisnumber=1;
+            BigInteger goal = BigInteger.Pow(10, n - 1);
+            BigInteger nextnumber = 1;
+            BigInteger thisnumber = 1;
             fibbonaccisequence.Add(thisnumber);
-            for(BigInteger thirdnumber = 1;thirdnumber<goal;thirdnumber=(nextnumber+thisnumber))
+            for (BigInteger thirdnumber = 1; thirdnumber < goal; thirdnumber = (nextnumber + thisnumber))
             {
                 fibbonaccisequence.Add(thirdnumber);
                 thisnumber = nextnumber;
@@ -427,20 +676,20 @@ namespace ProjEuler
         }
         public static void generatecollatz(int n)
         {
-            for(int i=2;i<n;i++)
+            for (int i = 2; i < n; i++)
             {
                 long temp = i;
                 int count = 1;
-                while(temp>1)
+                while (temp > 1)
                 {
                     if (CollatzSequences.ContainsKey(temp))
                     {
-                        count += CollatzSequences[temp]-1;
+                        count += CollatzSequences[temp] - 1;
                         temp = 1;
                     }
                     else
                     {
-                        if(temp%2==0)
+                        if (temp % 2 == 0)
                         {
                             temp /= 2;
                         }
@@ -459,14 +708,117 @@ namespace ProjEuler
     }
     class MiscFunctions
     {
+        public static HashSet<int> ListToHash(List<int> list)
+        {
+            var hashSet = new HashSet<int>(list);
+            return hashSet;
+        }
+        public static double CancelOutSameDigit(int a,int b)
+        {
+            List<int> digitsa = MiscFunctions.DigitsFromInt(a).ToList();
+            List<int> digitsb = MiscFunctions.DigitsFromInt(b).ToList();
+            List<int> intersect = digitsa.Intersect(digitsb).ToList();
+            if (intersect.Count == 1)
+            {
+                digitsa.Remove(intersect[0]);
+                digitsb.Remove(intersect[0]);
+                
+                if(digitsb[0]!=0)
+                { 
+
+                    return (double)digitsa[0] / (double)digitsb[0];
+
+                }
+            }
+            
+                return 0;
+
+        }
+        public static List<List<int>> removedupes(List<List<int>> list)
+        {
+            var finalList = list.GroupBy(x => String.Join(",", x))
+                         .Select(x => x.First().ToList())
+                         .ToList();
+            return finalList;
+        }
+
+        public static int UppercaseWordValue(string n)
+        {
+            int sum = 0;
+            foreach (char letter in n)
+            {
+                sum += (letter - '@');
+            }
+            return sum;
+        }
+        public static void Simplify(int[] numbers)
+        {
+            int gcd = GCD(numbers);
+            for (int i = 0; i < numbers.Length; i++)
+                numbers[i] /= gcd;
+        }
+        public static int GCD(int a, int b)
+        {
+            while (b > 0)
+            {
+                int rem = a % b;
+                a = b;
+                b = rem;
+            }
+            return a;
+        }
+        public static int GCD(int[] args)
+        {
+            // using LINQ:
+            return args.Aggregate((gcd, arg) => GCD(gcd, arg));
+        }
+        public static bool IsPandigital(int n)
+        {
+            if(n>1000000000)
+            {
+                return false;
+            }
+            int[] nums = MiscFunctions.DigitsFromInt(n);
+            int[] dig = new int[nums.Length];
+            for(int i=0;i<dig.Length;i++)
+            {
+                dig[i] = i + 1;
+            }
+            return (nums.OrderBy(x => x).ToArray().SequenceEqual( dig));
+
+        }
+        public static bool IsPandigital(List<int> n)
+        {
+            if(n.Count()!=9)
+            {
+                return false;
+            }
+            if(n.Distinct().Count()!=9)
+            {
+                return false;
+            }
+            int[] dig = new int[9] { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+            return (n.OrderBy(x => x).ToArray().SequenceEqual(dig));
+
+        }
         public static string ListToString(List<int> list)
         {
             StringBuilder a = new StringBuilder();
-            foreach(int i in list)
+            foreach (int i in list)
             {
                 a.Append(i);
             }
             return a.ToString();
+        }
+        public static int ListToInt(List<int> list)
+        {
+            string n = ListToString(list);
+            return Int32.Parse(n);
+        }
+        public static long ListToLong(List<int> list)
+        {
+            string n = ListToString(list);
+            return Int64.Parse(n);
         }
         public static int ReturnDistinctCountList(List<int> list, int a)
         {
@@ -481,14 +833,14 @@ namespace ProjEuler
             List<int> divisors = new List<int>();
             // Note that this loop runs  
             // till square root 
-            for (int i = 1; i <= Math.Sqrt(n);i++)
+            for (int i = 1; i <= Math.Sqrt(n); i++)
             {
                 if (n % i == 0)
                 {
 
                     // If divisors are equal, 
                     if (n / i == i)
-                    { 
+                    {
                         divisors.Add(i);
                     }
                     else
@@ -503,21 +855,32 @@ namespace ProjEuler
         public static List<int> ProperDivisors(int n)
         {
             List<int> divisors = Divisors(n);
-            
+
             divisors.Remove(n);
             return divisors;
         }
+        public static int[] DigitsFromInt(int n)
+        {
+            return FileFunctions.stringtointarray(n.ToString());
+        }
         public static int SumOfDigits(BigInteger n)
         {
-             int[] nums = FileFunctions.stringtointarray(n.ToString());
+            int[] nums = FileFunctions.stringtointarray(n.ToString());
             return nums.Sum();
         }
     }
     class FileFunctions
-    { 
+    {
+        public static List<List<int>> ienumtolist (IEnumerable<IEnumerable<int>> T)
+        {
+            var list = T.Select(c => c.ToList()).ToList(); //last ToList to get all conversions in a single list
+            return list;
+
+        }
+
         public static string readfileintostring(string n)
         {
-            string text = System.IO.File.ReadAllText(@"C:\Users\Ryan\source\repos\ProjEuler\ProjEuler\ProjEuler\bin\" + n+ ".txt");
+            string text = System.IO.File.ReadAllText(@"C:\Users\Ryan\source\repos\ProjEuler\ProjEuler\ProjEuler\bin\" + n + ".txt");
             return text;
         }
         public static string[] readfileintostringarr(string n)
@@ -541,7 +904,7 @@ namespace ProjEuler
         public static List<BigInteger> stringarrtobigint(string[] arr)
         {
             List<BigInteger> big = new List<BigInteger>();
-            foreach(string bleh in arr)
+            foreach (string bleh in arr)
             {
                 big.Add(BigInteger.Parse(bleh));
             }
@@ -550,8 +913,8 @@ namespace ProjEuler
         public static int[][] stringtointarraySplit2d(string[] n, char p)
         {
             string[] t = n[0].Split(' ');
-            int [][] arr = new int[n.Count()][];
-            for(int i=0;i<n.Count();i++)
+            int[][] arr = new int[n.Count()][];
+            for (int i = 0; i < n.Count(); i++)
             {
                 string[] temp = n[i].Split(' ');
                 arr[i] = Array.ConvertAll(temp, int.Parse);
